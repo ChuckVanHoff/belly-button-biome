@@ -4,7 +4,7 @@ function buildMetadata(sample) {
 
   // Use `d3.json` to fetch the metadata for a sample
   var defaultURL = `/metadata/${sample}`;
-  var metadata = d3.json(defaultURL).then(data => {
+  d3.json(defaultURL).then(data => {
 
     // Use d3 to select the panel with id of `#sample-metadata`
     var selection = d3.select(`#sample-metadata`);
@@ -26,16 +26,68 @@ function buildMetadata(sample) {
     // buildGauge(data.WFREQ);
 }
 
+
 function buildCharts(sample) {
 
   // @TODO: Use `d3.json` to fetch the sample data for the plots
-  var defaultURL = `/sample/${sample}`;
+  var defaultURL = `/samples/${sample}`;
+  d3.json(defaultURL).then(data => {
 
-    // @TODO: Build a Bubble Chart using the sample data
+    var ids = data.otu_ids;
+    var labels = data.otu_labels;
+    var counts = data.sample_values;
+    var dataObjectArray = [];
 
-    // @TODO: Build a Pie Chart
+    // Combine the data sets into one array of objects (for sorting)
+    for (var d = 0; d < labels.length; d++) {
+      dataObjectArray.push({'count': counts[d], 
+      'code': ids[d], 'label': labels[d]}
+    )};
+    
+    // Sort the array in descending order according to the count key values
+    dataObjectArray.sort(function(a, b) {return (b.count) - (a.count)});
+
     // HINT: You will need to use slice() to grab the top 10 sample_values,
     // otu_ids, and labels (10 each).
+    var sorted_slice = dataObjectArray.slice(0,10);
+
+    // @TODO: Build a Pie Chart using the sample data
+
+    var pieLayout = { title: "Relative Bacteria Type Percentages",
+                      indexLabelPlacement: "outside",
+                      "layout": "auto"
+                    };
+
+    var pieData = [{ 'values' : sorted_slice.map(data => data.count),
+                    'labels' : sorted_slice.map(data => data.label),
+                    'textinfo': 'percent',
+                    'hoverinfo' :('text'+'labels'+'values'+'percent'),
+                    'type' : 'pie'
+                  }];
+    
+    // Plot the pie chart
+    Plotly.newPlot("pie", pieData, pieLayout);
+
+    // @TODO: Build a Bubble Chart
+
+    var bubblelayout = {title: "Microbes Compared: (Displays All)",
+                        hovermode:"closest",
+                        xaxis: {title:"OTU ID (Microbe identification number)"},
+                        yaxis: {title:"Counts of microbe"}
+                      }; 
+      
+    var bubbledata=[{x:ids,
+                    y:counts,
+                    text: labels,
+                    mode: "markers",
+                    marker: {size:counts,
+                            color:ids,
+                            colorscale: "Earth"} 
+                    }];
+                    
+    // Plot the bubble chart                
+    Plotly.newPlot("bubble",bubbledata,bubblelayout);
+  });
 }
 
 function init() {
@@ -53,7 +105,7 @@ function init() {
   
     // Use the first sample from the list to build the initial plots
     const firstSample = sampleNames[0];
-    // buildCharts(firstSample);
+    buildCharts(firstSample);
     buildMetadata(firstSample);
   });
 }
@@ -66,4 +118,3 @@ function optionChanged(newSample) {
 
 // Initialize the dashboard
 init();
-// buildMetadata();
