@@ -1,1 +1,1 @@
-web: gunicorn button-crack-app/app:app
+web: gunicorn button-crack-app.app:app
