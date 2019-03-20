@@ -59,7 +59,7 @@ function buildCharts(sample) {
                     };
 
     var pieData = [{ 'values' : sorted_slice.map(data => data.count),
-                    'labels' : sorted_slice.map(data => data.label),
+                    'labels' : sorted_slice.map(data => data.code),
                     'textinfo': 'percent',
                     'hoverinfo' :('text'+'labels'+'values'+'percent'),
                     'type' : 'pie'
