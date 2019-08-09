@@ -1,1 +1,1 @@
-web: gunicorn app:app
+web: gunicorn button-biome-app.app:app
