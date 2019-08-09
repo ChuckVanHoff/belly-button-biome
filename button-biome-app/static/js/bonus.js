@@ -1,6 +1,4 @@
-/**
- * BONUS Solution
- * */
+// Build guage chart
 function buildGauge(wfreq) {
   // Enter the washing frequency between 0 and 180
   var level = parseFloat(wfreq) * 20;
